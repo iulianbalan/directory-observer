@@ -34,6 +34,18 @@ public class Utils {
 	}
 	
 	/**
+	 * Utility function meant to control all system's properties 
+	 * necessary to perform a monitoring
+	 * 
+	 * @param f File representing the monitored folder
+	 * @return true if everything is all right
+	 */
+	public static boolean checkDirectory(File f) {
+		
+		return f.exists() && f.isDirectory() && f.canRead();		
+	}
+	
+	/**
 	 * Serializing object to JSON
 	 * 
 	 * @param o any object
