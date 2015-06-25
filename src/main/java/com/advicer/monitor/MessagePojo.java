@@ -1,5 +1,13 @@
 package com.advicer.monitor;
 
+/**
+ * Class that provides a very basic model
+ * of a message that is going to be serialized.
+ * No need to comment all getters and setters 
+ * 
+ * @author Iulian Balan
+ *
+ */
 public class MessagePojo {
 	
 	private String action;

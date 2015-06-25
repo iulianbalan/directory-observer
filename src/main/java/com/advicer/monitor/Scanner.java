@@ -16,6 +16,12 @@ import java.util.Observable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class used to monitor a directory on the file system
+ * 
+ * @author Iulian Balan
+ *
+ */
 public class Scanner extends Observable {
 
 	private static final Logger log = LoggerFactory.getLogger(Scanner.class);
@@ -33,6 +39,10 @@ public class Scanner extends Observable {
 		CREATION, DELETION, MODIFICATION
 	}
 
+	/** Main constructor
+	 * @param path String that contains the full path of the directory
+	 * @throws IOException If an I/O error occurs
+	 */
 	public Scanner(String path) throws IOException {
 		this.dir = Paths.get(path);
 		this.watcher = FileSystems.getDefault().newWatchService();
@@ -49,6 +59,13 @@ public class Scanner extends Observable {
 		}
 	}
 
+	/**
+	 * Function used to exclude some events from being monitored
+	 * 
+	 * @param event intended to exclude
+	 * @param exclude true if the event should be excluded
+	 * @return the instance of this object that permits chaining
+	 */
 	public Scanner excludeEventFromListening(Events event, boolean exclude) {
 		if (!exclude)
 			return this;
@@ -83,6 +100,11 @@ public class Scanner extends Observable {
 			kindEvents.add(getEventMapped(event));
 	}
 
+	/**
+	 * Procedure that start the actual monitoring 
+	 * 
+	 * @throws IOException If an I/O error occurs
+	 */
 	public void startMonitoring() throws IOException {
 		
 		//register directory for monitoring
@@ -92,7 +114,6 @@ public class Scanner extends Observable {
 			// wait for key to be signaled
 			WatchKey key;
 			try {
-
 				key = this.watcher.take();
 			} catch (InterruptedException e) {
 				//Don't know what to do with this exception
@@ -101,27 +122,31 @@ public class Scanner extends Observable {
 			}
 
 			for (WatchEvent<?> event : key.pollEvents()) {
+				
 				WatchEvent.Kind<?> kind = event.kind();
+				MessagePojo msg = createMessage(kind, (Path) event.context());
 				
-				MessagePojo msg = new MessagePojo();
+				if (msg == null) continue;
 				
-				if (kind == StandardWatchEventKinds.OVERFLOW) 
-					continue;
-				log.info(kind.toString());
-				msg.setAction(kind.toString());				
-				msg.setFullPath(dir.toAbsolutePath().toString());
-				
-				// The filename is the context of the event.
-				Path filename = (Path) event.context();
-				
-				msg.setFile(filename.toString());
 				setChanged();
 				notifyObservers(msg);
 			}
-
 			if (!key.reset()) {
 				break;
 			}
 		}
+	}
+	
+	private MessagePojo createMessage(WatchEvent.Kind<?> kind, Path newFile) {
+		MessagePojo msg = new MessagePojo();
+		
+		if (kind == StandardWatchEventKinds.OVERFLOW) 
+			return null;
+		log.info(kind.toString());
+		msg.setAction(kind.toString());				
+		msg.setFullPath(dir.toAbsolutePath().toString());
+		
+		msg.setFile(newFile.toString());
+		return msg;
 	}
 }

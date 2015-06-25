@@ -10,10 +10,17 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
+ * Class used for the command line options and arguments
+ * This class is an implementation of ICliOptions
+ * 
  * @author Iulian Balan
  *
  */
-public class CliOptions {
+/**
+ * @author Ilinca
+ *
+ */
+public class CliOptions implements ICliOptions {
 
 private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet parsed";
 	//	Constants for 'path' cli argument
@@ -39,9 +46,12 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 	private CommandLine line;
 
 
-	@SuppressWarnings("unused")
-	private CliOptions(){}
 
+	/**
+	 * Main constructor that takes Main Class' arguments
+	 * 
+	 * @param args
+	 */
 	public CliOptions(String[]args){
 		this.args = args;
 		this.options = new Options();
@@ -51,13 +61,11 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		return this.options;
 	}
 
-	/**
-	 * Use directory monitor options that include:
-	 * required full path and optional flags C D and M
-	 * 
-	 * @return this instance
+	/* (non-Javadoc)
+	 * @see com.advicer.monitor.ICliOptions#useDirectoryMonitorOptions()
 	 */
-	public CliOptions useDirectoryMonitorOptions() {
+	@Override
+	public ICliOptions useDirectoryMonitorOptions() {
 		
 		OptionGroup groupReq = new OptionGroup();
 		
@@ -95,12 +103,10 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		return this;
 	}
 
-	/**
-	 * Parse function 
-	 * 
-	 * @return parsed CommandLine
-	 * @throws ParseException
+	/* (non-Javadoc)
+	 * @see com.advicer.monitor.ICliOptions#parse()
 	 */
+	@Override
 	public void parse() throws ParseException {
 		if (line == null) {
 			// 	create the command line parser
@@ -109,6 +115,10 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.advicer.monitor.ICliOptions#hasOption(com.advicer.monitor.CliOptions.DirectoryObserver)
+	 */
+	@Override
 	public boolean hasOption(DirectoryObserver arg) throws ParseException{
 		if (line == null) {
 			throw new ParseException(COMMAND_LINE_NOT_PARSED);
@@ -117,6 +127,10 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.advicer.monitor.ICliOptions#getOptionValue(com.advicer.monitor.CliOptions.DirectoryObserver)
+	 */
+	@Override
 	public String getOptionValue(DirectoryObserver arg) throws ParseException {
 		if (line == null) {
 			throw new ParseException(COMMAND_LINE_NOT_PARSED);
@@ -137,10 +151,12 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.advicer.monitor.ICliOptions#printUsage(java.lang.String)
+	 */
+	@Override
 	public void  printUsage(String cmdLineSyntax) {
 		HelpFormatter form = new HelpFormatter();
 		form.printHelp(cmdLineSyntax, this.options);
 	}
-	
-
 }

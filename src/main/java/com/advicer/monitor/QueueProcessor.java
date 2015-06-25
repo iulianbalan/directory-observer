@@ -1,6 +1,7 @@
 package com.advicer.monitor;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeoutException;
 
@@ -17,8 +18,11 @@ import com.rabbitmq.client.ConnectionFactory;
  */
 public class QueueProcessor implements Runnable {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(QueueProcessor.class);
+	private static final String CONNECTED = "Connected to RabbitMQ server at {}:{}";
+
+	private static final String EXCHANGE_TYPE = "topic";
+
+	private static final Logger log = LoggerFactory.getLogger(QueueProcessor.class);
 
 	private static final String WAITING_FILES_PROCESSOR = "Waiting for new test messages to be processed!";
 	
@@ -27,12 +31,56 @@ public class QueueProcessor implements Runnable {
 	
 
 	private BlockingQueue<MessagePojo> testQueue;
+	private Connection connection;
+	private Channel channel;
 
+	/**
+	 * Main constructor
+	 * 
+	 * @param queue provide a BlockingQueue implementation
+	 */
 	public QueueProcessor(BlockingQueue<MessagePojo> queue) {
 		this.testQueue = queue;
-
 	}
 	
+	/**
+	 * Create a RabbitMQ connection using default credentials
+	 * 
+	 * @param credentials
+	 * @throws IOException when there's trouble establishing a new connection
+	 * @throws TimeoutException when there's trouble establishing a new connection
+	 */
+	public void connectToRabbitMq() throws IOException, TimeoutException {
+		ConnectionFactory factory = new ConnectionFactory();
+		this.connection = factory.newConnection();
+		log.info(CONNECTED, factory.getHost(), factory.getPort());
+	}
+	
+	/**
+	 * Create a RabbitMQ connection using custom credentials
+	 * 
+	 * @param credentials
+	 * @throws IOException when there's trouble establishing a new connection
+	 * @throws TimeoutException when there's trouble establishing a new connection
+	 */
+	public void connectToRabbitMq(RabbitMQCredentials credentials) throws IOException, TimeoutException {
+		ConnectionFactory factory = new ConnectionFactory();
+		if (credentials.getHostname() != null) {
+			factory.setHost(credentials.getHostname());
+		}
+		if (credentials.getPort() > 0) {
+			factory.setPort(credentials.getPort());
+		}
+		if (credentials.getUsername() != null) {
+			factory.setUsername(credentials.getUsername());
+		}
+		if (credentials.getPassword() != null) {
+			factory.setPassword(credentials.getPassword());
+		}
+		this.connection = factory.newConnection();
+		log.info(CONNECTED, factory.getHost(), factory.getPort());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -48,34 +96,33 @@ public class QueueProcessor implements Runnable {
 				}
 				msg = testQueue.take();
 			} catch (InterruptedException e) {
-				log.error("Error!", e);
+
+				try {
+					channel.close();
+					connection.close();
+				} catch (IOException | TimeoutException e1) {
+					log.error(e1.getMessage(), e1);
+					Thread.currentThread().interrupt();
+				}finally {
+					log.error(e.getMessage(), e);
+				}
 			}
 			try {
 				process(msg);
 			} catch (IOException e) {
 				//dont need to break flow, just log the error and move on
-				log.warn("Unexpected error: ", e);
-			} catch (TimeoutException e) {
-				//dont need to break flow, just log the error and move on
-				log.warn("Unexpected error: ", e);
-			}
+				log.warn(e.getMessage(), e);
+			} 
 		}
 	}
 
-	private void process(MessagePojo msg) throws TimeoutException, IOException  {
-		
+	private void process(MessagePojo msg) throws IOException  {
 
-		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost("localhost");
-		Connection connection = factory.newConnection();
+		Channel channel = this.connection.createChannel();
+		channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true);
 		
-		Channel channel = connection.createChannel();
-		channel.exchangeDeclare(EXCHANGE_NAME, "topic", true);
-		
-		String message = Utils.messagePojoToString(msg);
-		channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, message.getBytes("UTF-8"));
+		String message = Utils.ObjectToJson(msg);
+		channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, message.getBytes(StandardCharsets.UTF_8));
 
-		channel.close();
-		connection.close();
 	}
 }
