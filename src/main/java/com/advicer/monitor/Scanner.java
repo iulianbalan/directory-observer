@@ -23,50 +23,70 @@ public class Scanner extends Observable {
 	private WatchService watcher;
 	private Path dir;
 
-	private boolean create;
-	private boolean delete;
-	private boolean edit;
-
-	public Scanner() throws IOException {
-
-		this.watcher = FileSystems.getDefault().newWatchService();
-
+	
+	//Events enabled by default
+	private boolean create = true;
+	private boolean delete = true;
+	private boolean edit = true;
+	
+	public enum Events {
+		CREATION, DELETION, MODIFICATION
 	}
 
-	public void excludeCreate(boolean hasOption) {
-		this.create = hasOption;
-	}
-
-	public void excludeDelete(boolean hasOption) {
-		this.delete = hasOption;
-	}
-
-	public void excludeEdit(boolean hasOption) {
-		this.edit = hasOption;
-	}
-
-	public void monitor(String path) {
-
+	public Scanner(String path) throws IOException {
 		this.dir = Paths.get(path);
-		try {
-			List<WatchEvent.Kind<?>> kindEvents = new ArrayList<WatchEvent.Kind<?>>();
-			if (create)
-				kindEvents.add(StandardWatchEventKinds.ENTRY_CREATE);
-			if (delete)
-				kindEvents.add(StandardWatchEventKinds.ENTRY_DELETE);
-			if (edit)
-				kindEvents.add(StandardWatchEventKinds.ENTRY_MODIFY);
-			
-			WatchEvent.Kind<?>[] array = kindEvents.toArray(new WatchEvent.Kind<?>[kindEvents.size()]);
-			dir.register(watcher,(Kind[]) array);
-		} catch (IOException e) {
-
-			log.debug(e.getMessage());
-			e.printStackTrace();
+		this.watcher = FileSystems.getDefault().newWatchService();
+	}
+	
+	private Kind<Path> getEventMapped (Events event) {
+		switch (event) {
+		//no need for break since I'm returning
+		case CREATION: return StandardWatchEventKinds.ENTRY_CREATE;
+		case DELETION: return StandardWatchEventKinds.ENTRY_DELETE;
+		case MODIFICATION: return StandardWatchEventKinds.ENTRY_MODIFY;
+		//Default case should NEVER happen!
+		default: return null;
 		}
 	}
 
-	public void run() {
+	public Scanner excludeEventFromListening(Events event, boolean exclude) {
+		if (!exclude)
+			return this;
+		
+		switch (event) {
+		case CREATION: 
+			this.create = false;
+			break; //avoid falling on next case
+		case DELETION: 
+			this.delete = false;
+			break; //avoid falling on next case
+		case MODIFICATION: 
+			this.edit = false;
+		}
+		return this;
+	}
+
+	private void monitor() throws IOException {
+
+		List<WatchEvent.Kind<?>> kindEvents = new ArrayList<WatchEvent.Kind<?>>();
+		addEventListener(kindEvents, Events.CREATION, this.create);
+		addEventListener(kindEvents, Events.DELETION, this.delete);
+		addEventListener(kindEvents, Events.MODIFICATION, this.edit);
+
+		WatchEvent.Kind<?>[] array = kindEvents.toArray(new WatchEvent.Kind<?>[kindEvents.size()]);
+		this.dir.register(watcher,(Kind[]) array);
+
+	}
+	
+	private void addEventListener(List<WatchEvent.Kind<?>> kindEvents, Events event, boolean listen){
+		if (listen)
+			kindEvents.add(getEventMapped(event));
+	}
+
+	public void startMonitoring() throws IOException {
+		
+		//register directory for monitoring
+		monitor();
 
 		while (true) {
 			// wait for key to be signaled
@@ -75,6 +95,7 @@ public class Scanner extends Observable {
 
 				key = this.watcher.take();
 			} catch (InterruptedException e) {
+				//Don't know what to do with this exception
 				log.error(e.getMessage(), e);
 				return;
 			}
@@ -83,30 +104,15 @@ public class Scanner extends Observable {
 				WatchEvent.Kind<?> kind = event.kind();
 				
 				MessagePojo msg = new MessagePojo();
+				
+				if (kind == StandardWatchEventKinds.OVERFLOW) 
+					continue;
+				log.info(kind.toString());
+				msg.setAction(kind.toString());				
 				msg.setFullPath(dir.toAbsolutePath().toString());
-
-				if (create && kind == StandardWatchEventKinds.ENTRY_CREATE) {
-//					log.info("Creating a new file");
-					msg.setAction("created");
-				} else if (delete && kind == StandardWatchEventKinds.ENTRY_DELETE) {
-//					log.info("Deleting a file");
-					msg.setAction("deleted");
-				} else if (edit && kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-//					log.info("Modifying a file");
-					msg.setAction("modified");
-				} else if (kind == StandardWatchEventKinds.OVERFLOW) {
-//					log.info("Overflow occured");
-					continue;
-				} else {
-//					nothing to notify
-					continue;
-				}
-
+				
 				// The filename is the context of the event.
-				@SuppressWarnings("unchecked")
-				WatchEvent<Path> ev = (WatchEvent<Path>) event;
-				Path filename = ev.context();
-
+				Path filename = (Path) event.context();
 				
 				msg.setFile(filename.toString());
 				setChanged();
@@ -118,5 +124,4 @@ public class Scanner extends Observable {
 			}
 		}
 	}
-
 }
