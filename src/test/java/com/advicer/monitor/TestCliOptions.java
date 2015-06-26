@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 
 import com.advicer.monitor.CliOptions.DirectoryObserver;
 
-public class TesCliOptions {
+public class TestCliOptions {
 	private static ExpectedException e;
 	
 	@BeforeClass
