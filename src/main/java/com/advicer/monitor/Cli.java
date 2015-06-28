@@ -2,6 +2,7 @@ package com.advicer.monitor;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.nio.file.StandardWatchEventKinds;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeoutException;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.advicer.monitor.CliOptions.DirectoryObserver;
-import com.advicer.monitor.Scanner.Events;
 
 /**
  * Main class containing main function
@@ -30,19 +30,17 @@ public class Cli {
 
 	private final static Logger log = LoggerFactory.getLogger(Cli.class);
 
-	private static String path;
-
 	public static void main(String[] args) throws TimeoutException {
-
+		
 		ICliOptions cliopts = CliOptionsFactory.getCliOptions(args);
 
 		try {
 
 			// parse the command line arguments
-			cliopts.useDirectoryMonitorOptions().parse();
+			cliopts.useDirectoryObserverOptions().parse();
 
 			// validate that path has been set
-			path = cliopts.getOptionValue(DirectoryObserver.PATH);
+			String path = cliopts.getOptionValue(DirectoryObserver.PATH);
 			if (!Utils.checkDirectory(path)) {
 				throw new DirectoryAccessException(ERROR_DIRECTORY);
 			}
@@ -57,11 +55,11 @@ public class Cli {
 
 			Scanner scanner = new Scanner(path);
 
-			scanner.excludeEventFromListening(Events.CREATION,
+			scanner.excludeEventFromListening(StandardWatchEventKinds.ENTRY_CREATE,
 						cliopts.hasOption(DirectoryObserver.CREATION))
-					.excludeEventFromListening(Events.DELETION,
+					.excludeEventFromListening(StandardWatchEventKinds.ENTRY_DELETE,
 							cliopts.hasOption(DirectoryObserver.DELETION))
-					.excludeEventFromListening(Events.MODIFICATION,
+					.excludeEventFromListening(StandardWatchEventKinds.ENTRY_MODIFY,
 							cliopts.hasOption(DirectoryObserver.MODIFICATION))
 					.addObserver(qh);
 

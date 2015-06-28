@@ -35,7 +35,7 @@ public class TestCliOptions {
 	@Test
 	public void tesUseDirectoryMonitorOptionsWithPath() throws ParseException {
 		CliOptions cli = new CliOptions(new String[0]);//{ "--path=C:\\Users\\balans\\Desktop\\lol"});
-		cli.useDirectoryMonitorOptions();
+		cli.useDirectoryObserverOptions();
 		OptionGroup optG = cli.getOptions().getOptionGroup(Option.builder("p").build());
 		Assert.assertTrue(optG.isRequired());
 		Assert.assertEquals(1, optG.getOptions().size());
@@ -44,7 +44,7 @@ public class TestCliOptions {
 	@Test
 	public void tesUseDirectoryMonitorOptionsWithFlags() throws ParseException {
 		CliOptions cli = new CliOptions(new String[0]);//{ "--path=C:\\Users\\balans\\Desktop\\lol -C -D -M"});
-		cli.useDirectoryMonitorOptions();
+		cli.useDirectoryObserverOptions();
 		OptionGroup optG = cli.getOptions().getOptionGroup(Option.builder("C").build());
 		Assert.assertFalse(optG.isRequired());
 		Assert.assertEquals(3, optG.getOptions().size());

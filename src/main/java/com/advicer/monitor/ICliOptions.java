@@ -18,7 +18,7 @@ public interface ICliOptions {
 	 * 
 	 * @return this instance
 	 */
-	public ICliOptions useDirectoryMonitorOptions();
+	public ICliOptions useDirectoryObserverOptions();
 
 	/**
 	 * Parse function 

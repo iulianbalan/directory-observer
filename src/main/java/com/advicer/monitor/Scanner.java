@@ -9,9 +9,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Observable;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,16 +28,7 @@ public class Scanner extends Observable {
 
 	private WatchService watcher;
 	private Path dir;
-
-	
-	//Events enabled by default
-	private boolean create = true;
-	private boolean delete = true;
-	private boolean edit = true;
-	
-	public enum Events {
-		CREATION, DELETION, MODIFICATION
-	}
+	private Set<WatchEvent.Kind<Path>> events;
 
 	/** Main constructor
 	 * @param path String that contains the full path of the directory
@@ -46,59 +37,36 @@ public class Scanner extends Observable {
 	public Scanner(String path) throws IOException {
 		this.dir = Paths.get(path);
 		this.watcher = FileSystems.getDefault().newWatchService();
-	}
-	
-	private Kind<Path> getEventMapped (Events event) {
-		switch (event) {
-		//no need for break since I'm returning
-		case CREATION: return StandardWatchEventKinds.ENTRY_CREATE;
-		case DELETION: return StandardWatchEventKinds.ENTRY_DELETE;
-		case MODIFICATION: return StandardWatchEventKinds.ENTRY_MODIFY;
-		//Default case should NEVER happen!
-		default: return null;
-		}
+		events = new HashSet<WatchEvent.Kind<Path>>();
+		
+		//Add all the events and exclude them on demand
+		events.add(StandardWatchEventKinds.ENTRY_CREATE);
+		events.add(StandardWatchEventKinds.ENTRY_DELETE);
+		events.add(StandardWatchEventKinds.ENTRY_MODIFY);
+		
 	}
 
 	/**
 	 * Function used to exclude some events from being monitored
 	 * 
-	 * @param event intended to exclude
+	 * @param event java.nio.file.StandardWatchEventKinds intended to exclude
 	 * @param exclude true if the event should be excluded
 	 * @return the instance of this object that permits chaining
 	 */
-	public Scanner excludeEventFromListening(Events event, boolean exclude) {
+	public Scanner excludeEventFromListening(WatchEvent.Kind<Path> event, boolean exclude) {
 		if (!exclude)
 			return this;
-		
-		switch (event) {
-		case CREATION: 
-			this.create = false;
-			break; //avoid falling on next case
-		case DELETION: 
-			this.delete = false;
-			break; //avoid falling on next case
-		case MODIFICATION: 
-			this.edit = false;
-		}
+		events.remove(event);
 		return this;
 	}
 
 	private void monitor() throws IOException {
 
-		List<WatchEvent.Kind<?>> kindEvents = new ArrayList<WatchEvent.Kind<?>>();
-		addEventListener(kindEvents, Events.CREATION, this.create);
-		addEventListener(kindEvents, Events.DELETION, this.delete);
-		addEventListener(kindEvents, Events.MODIFICATION, this.edit);
-
-		WatchEvent.Kind<?>[] array = kindEvents.toArray(new WatchEvent.Kind<?>[kindEvents.size()]);
+		WatchEvent.Kind<?>[] array = events.toArray(new WatchEvent.Kind<?>[events.size()]);
 		this.dir.register(watcher,(Kind[]) array);
 
 	}
-	
-	private void addEventListener(List<WatchEvent.Kind<?>> kindEvents, Events event, boolean listen){
-		if (listen)
-			kindEvents.add(getEventMapped(event));
-	}
+
 
 	/**
 	 * Procedure that start the actual monitoring 

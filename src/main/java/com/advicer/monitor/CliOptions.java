@@ -22,22 +22,28 @@ import org.apache.commons.cli.ParseException;
  */
 public class CliOptions implements ICliOptions {
 
-private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet parsed";
-	//	Constants for 'path' cli argument
-	private static final String PATH_DESC = "Give the absolute path to the directory to monitor";
-	private static final String PATH_ARG_SHORT = "p";
-	private static final String PATH_ARG_LONG = "path";
+	private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet parsed";
 	
-//	Constants for 'path' exclusion flags arguments
-	private static final String EXCLUDE_CREATION_ARG_SHORT = "C";
-	private static final String EXCLUDE_MODIFICATION_ARG_SHORT = "M";
-	private static final String EXCLUDE_DELETION_ARG_SHORT = "D";
+	//	Constants for cli argument descriptions
+	private static final String PATH_DESC = "Give the absolute path to the directory to monitor";
 	private static final String EXCLUDE_CREATION_DESC = "Select the flag of the monitoring if you want to exclude file CREATION";
 	private static final String EXCLUDE_MODIFICATION_DESC = "Select the flag of the monitoring if you want to exclude file MODIFICATION";
 	private static final String EXCLUDE_DELETION_DESC = "Select the flag of the monitoring if you want to exclude file DELETION";
 	
 	public enum DirectoryObserver {
-		PATH, CREATION, DELETION, MODIFICATION
+		PATH("p", "path"), CREATION("C"), DELETION("D"), MODIFICATION("M");
+		
+		//Making private fields final to avoid evil code
+		private final String flag;
+		private final String arg;
+		
+		//Every constructor has to initialize all final fields not yet initialized
+		DirectoryObserver(String flag){ this.flag = flag; this.arg = null; } 
+		DirectoryObserver(String flag, String arg){ this.flag = flag; this.arg = arg; }
+		
+		public String getFlag() { return this.flag; }
+		public String getArg() { return this.arg; }
+		
 	}
 	
 //	private fields
@@ -65,12 +71,12 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 	 * @see com.advicer.monitor.ICliOptions#useDirectoryMonitorOptions()
 	 */
 	@Override
-	public ICliOptions useDirectoryMonitorOptions() {
+	public ICliOptions useDirectoryObserverOptions() {
 		
 		OptionGroup groupReq = new OptionGroup();
 		
-		groupReq.addOption(Option.builder(PATH_ARG_SHORT)
-				.longOpt(PATH_ARG_LONG)
+		groupReq.addOption(Option.builder(DirectoryObserver.PATH.getFlag())
+				.longOpt(DirectoryObserver.PATH.getArg())
 				.hasArg()
 				.desc(PATH_DESC)
 				.build());
@@ -79,17 +85,17 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		
 		OptionGroup groupNotReq = new OptionGroup();
 		
-		groupNotReq.addOption(Option.builder(EXCLUDE_CREATION_ARG_SHORT)
+		groupNotReq.addOption(Option.builder(DirectoryObserver.CREATION.getFlag())
 //				.longOpt("ignore-file-creation")
 				.desc(EXCLUDE_CREATION_DESC)
 				.build());
 		
-		groupNotReq.addOption(Option.builder(EXCLUDE_DELETION_ARG_SHORT)
+		groupNotReq.addOption(Option.builder(DirectoryObserver.DELETION.getFlag())
 //				.longOpt("ignore-file-deletion")
 				.desc(EXCLUDE_DELETION_DESC)
 				.build());
 		
-		groupNotReq.addOption(Option.builder(EXCLUDE_MODIFICATION_ARG_SHORT)
+		groupNotReq.addOption(Option.builder(DirectoryObserver.MODIFICATION.getFlag())
 //				.longOpt("ignore-file-modification")
 				.desc(EXCLUDE_MODIFICATION_DESC)
 				.build());
@@ -123,7 +129,7 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		if (line == null) {
 			throw new ParseException(COMMAND_LINE_NOT_PARSED);
 		}
-		return this.line.hasOption(getArgMap(arg));
+		return this.line.hasOption(arg.getFlag());
 
 	}
 	
@@ -135,20 +141,7 @@ private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet pars
 		if (line == null) {
 			throw new ParseException(COMMAND_LINE_NOT_PARSED);
 		}
-		return this.line.getOptionValue(getArgMap(arg));
-	}
-	
-	private String getArgMap(DirectoryObserver arg) throws ParseException {
-		switch (arg) {
-		case PATH: return PATH_ARG_SHORT;
-		case CREATION: return EXCLUDE_CREATION_ARG_SHORT;
-		case DELETION: return EXCLUDE_DELETION_ARG_SHORT;
-		case MODIFICATION: return EXCLUDE_MODIFICATION_ARG_SHORT;
-		default:
-			//This should never happen since the input is limited by the definition
-			//of the enum
-			throw new ParseException(COMMAND_LINE_NOT_PARSED);
-		}
+		return this.line.getOptionValue(arg.getFlag());
 	}
 	
 	/* (non-Javadoc)
