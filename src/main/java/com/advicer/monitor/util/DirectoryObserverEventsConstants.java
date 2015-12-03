@@ -9,10 +9,22 @@ public enum DirectoryObserverEventsConstants {
     private final String arg;
 
     //Every constructor has to initialize all final fields not yet initialized
-    DirectoryObserverEventsConstants(String flag){ this.flag = flag; this.arg = null; }
-    DirectoryObserverEventsConstants(String flag, String arg){ this.flag = flag; this.arg = arg; }
+    DirectoryObserverEventsConstants(String flag) {
+        this.flag = flag;
+        this.arg = null;
+    }
 
-    public String getFlag() { return this.flag; }
-    public String getArg() { return this.arg; }
+    DirectoryObserverEventsConstants(String flag, String arg) {
+        this.flag = flag;
+        this.arg = arg;
+    }
+
+    public String getFlag() {
+        return this.flag;
+    }
+
+    public String getArg() {
+        return this.arg;
+    }
 
 }
