@@ -1,9 +1,10 @@
-package com.advicer.monitor;
+package com.advicer.monitor.queue;
 
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.BlockingQueue;
 
+import com.advicer.monitor.dto.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +22,13 @@ public class QueueHandler implements Observer{
 
 	private static final Logger log = LoggerFactory.getLogger(QueueHandler.class);
 	
-	private BlockingQueue<MessagePojo> testQueue;
+	private BlockingQueue<Message> testQueue;
 	
 	/**
 	 * Main constructor
 	 * @param queue BlockingQueue already initialized
 	 */
-	public QueueHandler(BlockingQueue<MessagePojo> queue) {
+	public QueueHandler(BlockingQueue<Message> queue) {
 		this.testQueue = queue;
 	}
 
@@ -35,8 +36,8 @@ public class QueueHandler implements Observer{
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable o, Object arg) {
-		if (arg instanceof MessagePojo) {
-			MessagePojo msg = (MessagePojo)arg;
+		if (arg instanceof Message) {
+			Message msg = (Message)arg;
 			try {
 				testQueue.put(msg);
 				log.info(MESSAGE_POSTED);

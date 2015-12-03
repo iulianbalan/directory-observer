@@ -1,5 +1,6 @@
-package com.advicer.monitor;
+package com.advicer.monitor.cli;
 
+import com.advicer.monitor.util.DirectoryObserverEventsConstants;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -16,11 +17,7 @@ import org.apache.commons.cli.ParseException;
  * @author Iulian Balan
  *
  */
-/**
- * @author Ilinca
- *
- */
-public class CliOptions implements ICliOptions {
+public class CliOptionsImpl implements CliOptions {
 
 	private static final String COMMAND_LINE_NOT_PARSED = "Command line not yet parsed";
 	
@@ -30,21 +27,7 @@ public class CliOptions implements ICliOptions {
 	private static final String EXCLUDE_MODIFICATION_DESC = "Select the flag of the monitoring if you want to exclude file MODIFICATION";
 	private static final String EXCLUDE_DELETION_DESC = "Select the flag of the monitoring if you want to exclude file DELETION";
 	
-	public enum DirectoryObserver {
-		PATH("p", "path"), CREATION("C"), DELETION("D"), MODIFICATION("M");
-		
-		//Making private fields final to avoid evil code
-		private final String flag;
-		private final String arg;
-		
-		//Every constructor has to initialize all final fields not yet initialized
-		DirectoryObserver(String flag){ this.flag = flag; this.arg = null; } 
-		DirectoryObserver(String flag, String arg){ this.flag = flag; this.arg = arg; }
-		
-		public String getFlag() { return this.flag; }
-		public String getArg() { return this.arg; }
-		
-	}
+
 	
 //	private fields
 	private String[] args;
@@ -58,12 +41,12 @@ public class CliOptions implements ICliOptions {
 	 * 
 	 * @param args
 	 */
-	public CliOptions(String[]args){
+	public CliOptionsImpl(String[]args){
 		this.args = args;
 		this.options = new Options();
 	}
 	
-	protected Options getOptions() {
+	public Options getOptions() {
 		return this.options;
 	}
 
@@ -71,12 +54,12 @@ public class CliOptions implements ICliOptions {
 	 * @see com.advicer.monitor.ICliOptions#useDirectoryMonitorOptions()
 	 */
 	@Override
-	public ICliOptions useDirectoryObserverOptions() {
+	public CliOptions useDirectoryObserverOptions() {
 		
 		OptionGroup groupReq = new OptionGroup();
 		
-		groupReq.addOption(Option.builder(DirectoryObserver.PATH.getFlag())
-				.longOpt(DirectoryObserver.PATH.getArg())
+		groupReq.addOption(Option.builder(DirectoryObserverEventsConstants.PATH.getFlag())
+				.longOpt(DirectoryObserverEventsConstants.PATH.getArg())
 				.hasArg()
 				.desc(PATH_DESC)
 				.build());
@@ -85,17 +68,17 @@ public class CliOptions implements ICliOptions {
 		
 		OptionGroup groupNotReq = new OptionGroup();
 		
-		groupNotReq.addOption(Option.builder(DirectoryObserver.CREATION.getFlag())
+		groupNotReq.addOption(Option.builder(DirectoryObserverEventsConstants.CREATION.getFlag())
 //				.longOpt("ignore-file-creation")
 				.desc(EXCLUDE_CREATION_DESC)
 				.build());
 		
-		groupNotReq.addOption(Option.builder(DirectoryObserver.DELETION.getFlag())
+		groupNotReq.addOption(Option.builder(DirectoryObserverEventsConstants.DELETION.getFlag())
 //				.longOpt("ignore-file-deletion")
 				.desc(EXCLUDE_DELETION_DESC)
 				.build());
 		
-		groupNotReq.addOption(Option.builder(DirectoryObserver.MODIFICATION.getFlag())
+		groupNotReq.addOption(Option.builder(DirectoryObserverEventsConstants.MODIFICATION.getFlag())
 //				.longOpt("ignore-file-modification")
 				.desc(EXCLUDE_MODIFICATION_DESC)
 				.build());
@@ -125,7 +108,7 @@ public class CliOptions implements ICliOptions {
 	 * @see com.advicer.monitor.ICliOptions#hasOption(com.advicer.monitor.CliOptions.DirectoryObserver)
 	 */
 	@Override
-	public boolean hasOption(DirectoryObserver arg) throws ParseException{
+	public boolean hasOption(DirectoryObserverEventsConstants arg) throws ParseException{
 		if (line == null) {
 			throw new ParseException(COMMAND_LINE_NOT_PARSED);
 		}
@@ -137,7 +120,7 @@ public class CliOptions implements ICliOptions {
 	 * @see com.advicer.monitor.ICliOptions#getOptionValue(com.advicer.monitor.CliOptions.DirectoryObserver)
 	 */
 	@Override
-	public String getOptionValue(DirectoryObserver arg) throws ParseException {
+	public String getOptionValue(DirectoryObserverEventsConstants arg) throws ParseException {
 		if (line == null) {
 			throw new ParseException(COMMAND_LINE_NOT_PARSED);
 		}
@@ -148,7 +131,7 @@ public class CliOptions implements ICliOptions {
 	 * @see com.advicer.monitor.ICliOptions#printUsage(java.lang.String)
 	 */
 	@Override
-	public void  printUsage(String cmdLineSyntax) {
+	public void printUsage(String cmdLineSyntax) {
 		HelpFormatter form = new HelpFormatter();
 		form.printHelp(cmdLineSyntax, this.options);
 	}

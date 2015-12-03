@@ -1,10 +1,13 @@
-package com.advicer.monitor;
+package com.advicer.monitor.queue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeoutException;
 
+import com.advicer.monitor.AMQP.RabbitMQCredentials;
+import com.advicer.monitor.util.Utils;
+import com.advicer.monitor.dto.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +33,7 @@ public class QueueProcessor implements Runnable {
 	private static final String ROUTING_KEY = "monitoring";
 	
 
-	private BlockingQueue<MessagePojo> testQueue;
+	private BlockingQueue<Message> testQueue;
 	private Connection connection;
 	private Channel channel;
 
@@ -39,7 +42,7 @@ public class QueueProcessor implements Runnable {
 	 * 
 	 * @param queue provide a BlockingQueue implementation
 	 */
-	public QueueProcessor(BlockingQueue<MessagePojo> queue) {
+	public QueueProcessor(BlockingQueue<Message> queue) {
 		this.testQueue = queue;
 	}
 	
@@ -89,7 +92,7 @@ public class QueueProcessor implements Runnable {
 	public void run() {
 
 		while (true) {
-			MessagePojo msg = null;
+			Message msg = null;
 			try {
 				if (testQueue.isEmpty()) {
 					log.info(WAITING_FILES_PROCESSOR);
@@ -116,7 +119,7 @@ public class QueueProcessor implements Runnable {
 		}
 	}
 
-	private void process(MessagePojo msg) throws IOException  {
+	private void process(Message msg) throws IOException  {
 
 		Channel channel = this.connection.createChannel();
 		channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true);

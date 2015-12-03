@@ -1,4 +1,4 @@
-package com.advicer.monitor;
+package com.advicer.monitor.exceptions;
 
 /**
  * Custom Exception

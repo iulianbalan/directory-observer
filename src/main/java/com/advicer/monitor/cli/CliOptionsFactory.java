@@ -1,4 +1,4 @@
-package com.advicer.monitor;
+package com.advicer.monitor.cli;
 
 /**
  * Factory class
@@ -13,8 +13,8 @@ public class CliOptionsFactory {
 	 * @param args array of arguments
 	 * @return an instance of CliOptions class
 	 */
-	public static ICliOptions getCliOptions(String[] args) {
-		return new CliOptions(args);
+	public static CliOptions getCliOptions(String[] args) {
+		return new CliOptionsImpl(args);
 	}
 
 }

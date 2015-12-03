@@ -1,4 +1,4 @@
-package com.advicer.monitor;
+package com.advicer.monitor.AMQP;
 
 import java.util.Properties;
 

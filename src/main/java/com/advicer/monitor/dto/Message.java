@@ -1,4 +1,4 @@
-package com.advicer.monitor;
+package com.advicer.monitor.dto;
 
 /**
  * Class that provides a very basic model
@@ -8,39 +8,22 @@ package com.advicer.monitor;
  * @author Iulian Balan
  *
  */
-public class MessagePojo {
+public class Message {
 	
 	private String action;
 	private String file;
 	private String fullPath;
 	
-	public MessagePojo() {
+	public Message() {
 		super();
-	}
-	
-	public MessagePojo(String action, String path) {
-		super();
-		this.action = action;
-		this.file = path;
 	}
 
-	public String getAction() {
-		return action;
-	}
 	public void setAction(String action) {
 		this.action = action;
 	}
 
-	public String getFile() {
-		return file;
-	}
-
 	public void setFile(String file) {
 		this.file = file;
-	}
-
-	public String getFullPath() {
-		return fullPath;
 	}
 
 	public void setFullPath(String fullPath) {

@@ -1,8 +1,7 @@
-package com.advicer.monitor;
+package com.advicer.monitor.cli;
 
+import com.advicer.monitor.util.DirectoryObserverEventsConstants;
 import org.apache.commons.cli.ParseException;
-
-import com.advicer.monitor.CliOptions.DirectoryObserver;
 
 /**
  * Interface used to interact with CliOptions
@@ -10,7 +9,7 @@ import com.advicer.monitor.CliOptions.DirectoryObserver;
  * @author Iulian Balan
  *
  */
-public interface ICliOptions {
+public interface CliOptions {
 
 	/**
 	 * Use directory monitor options that include:
@@ -18,7 +17,7 @@ public interface ICliOptions {
 	 * 
 	 * @return this instance
 	 */
-	public ICliOptions useDirectoryObserverOptions();
+	public CliOptions useDirectoryObserverOptions();
 
 	/**
 	 * Parse function 
@@ -37,7 +36,7 @@ public interface ICliOptions {
 	 * @throws ParseException if the command line was
 	 * not previously parsed
 	 */
-	public boolean hasOption(DirectoryObserver arg) throws ParseException;
+	public boolean hasOption(DirectoryObserverEventsConstants arg) throws ParseException;
 
 	/**
 	 * Get the value of an argument provided at command line
@@ -47,7 +46,7 @@ public interface ICliOptions {
 	 * @throws ParseException if the command line was
 	 * not previously parsed
 	 */
-	public String getOptionValue(DirectoryObserver arg) throws ParseException;
+	public String getOptionValue(DirectoryObserverEventsConstants arg) throws ParseException;
 
 	/**
 	 * Prints usage of the execution

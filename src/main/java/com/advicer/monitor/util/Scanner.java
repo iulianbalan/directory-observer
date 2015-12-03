@@ -1,4 +1,4 @@
-package com.advicer.monitor;
+package com.advicer.monitor.util;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Observable;
 import java.util.Set;
 
+import com.advicer.monitor.dto.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,7 @@ public class Scanner extends Observable {
 			for (WatchEvent<?> event : key.pollEvents()) {
 				
 				WatchEvent.Kind<?> kind = event.kind();
-				MessagePojo msg = createMessage(kind, (Path) event.context());
+				Message msg = createMessage(kind, (Path) event.context());
 				
 				if (msg == null) continue;
 				
@@ -105,8 +106,8 @@ public class Scanner extends Observable {
 		}
 	}
 	
-	private MessagePojo createMessage(WatchEvent.Kind<?> kind, Path newFile) {
-		MessagePojo msg = new MessagePojo();
+	private Message createMessage(WatchEvent.Kind<?> kind, Path newFile) {
+		Message msg = new Message();
 		
 		if (kind == StandardWatchEventKinds.OVERFLOW) 
 			return null;
