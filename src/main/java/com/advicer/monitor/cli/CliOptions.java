@@ -1,6 +1,6 @@
 package com.advicer.monitor.cli;
 
-import com.advicer.monitor.util.DirectoryObserverEventsConstants;
+import com.advicer.monitor.events.DirectoryObserverEventsConstants;
 import org.apache.commons.cli.ParseException;
 
 /**
@@ -16,15 +16,14 @@ public interface CliOptions {
      *
      * @return this instance
      */
-    public CliOptions useDirectoryObserverOptions();
+    CliOptions useDirectoryObserverOptions();
 
     /**
      * Parse function
      *
-     * @return parsed CommandLine
      * @throws ParseException
      */
-    public void parse() throws ParseException;
+    void parse() throws ParseException;
 
     /**
      * Controls if there is an option in the command
@@ -35,7 +34,7 @@ public interface CliOptions {
      * @throws ParseException if the command line was
      *                        not previously parsed
      */
-    public boolean hasOption(DirectoryObserverEventsConstants arg) throws ParseException;
+    boolean hasOption(DirectoryObserverEventsConstants arg) throws ParseException;
 
     /**
      * Get the value of an argument provided at command line
@@ -45,13 +44,13 @@ public interface CliOptions {
      * @throws ParseException if the command line was
      *                        not previously parsed
      */
-    public String getOptionValue(DirectoryObserverEventsConstants arg) throws ParseException;
+    String getOptionValue(DirectoryObserverEventsConstants arg) throws ParseException;
 
     /**
      * Prints usage of the execution
      *
-     * @param cmdLineSyntax
+     * @param cmdLineSyntax the correct usage of the command line
      */
-    public void printUsage(String cmdLineSyntax);
+    void printUsage(String cmdLineSyntax);
 
 }

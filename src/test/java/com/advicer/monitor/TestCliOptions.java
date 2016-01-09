@@ -9,7 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.advicer.monitor.util.DirectoryObserverEventsConstants;
+import com.advicer.monitor.events.DirectoryObserverEventsConstants;
 
 public class TestCliOptions {
 	private static ExpectedException e;

@@ -1,4 +1,4 @@
-package com.advicer.monitor.util;
+package com.advicer.monitor.events;
 
 public enum DirectoryObserverEventsConstants {
 

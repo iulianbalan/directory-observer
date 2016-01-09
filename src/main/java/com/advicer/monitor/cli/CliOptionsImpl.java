@@ -1,6 +1,6 @@
 package com.advicer.monitor.cli;
 
-import com.advicer.monitor.util.DirectoryObserverEventsConstants;
+import com.advicer.monitor.events.DirectoryObserverEventsConstants;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -36,7 +36,7 @@ public class CliOptionsImpl implements CliOptions {
     /**
      * Main constructor that takes Main Class' arguments
      *
-     * @param args
+     * @param args arguments from main class
      */
     public CliOptionsImpl(String[] args) {
         this.args = args;

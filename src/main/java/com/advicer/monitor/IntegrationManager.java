@@ -5,7 +5,7 @@ import com.advicer.monitor.cli.CliOptionsFactory;
 import com.advicer.monitor.exceptions.DirectoryAccessException;
 import com.advicer.monitor.queue.QueueHandler;
 import com.advicer.monitor.queue.QueueProcessor;
-import com.advicer.monitor.util.DirectoryObserverEventsConstants;
+import com.advicer.monitor.events.DirectoryObserverEventsConstants;
 import com.advicer.monitor.util.Scanner;
 import com.advicer.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;

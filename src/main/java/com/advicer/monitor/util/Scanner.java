@@ -91,21 +91,21 @@ public class Scanner extends Observable {
                 log.error(e.getMessage(), e);
                 return;
             }
-
-            for (WatchEvent<?> event : key.pollEvents()) {
-
-                WatchEvent.Kind<?> kind = event.kind();
-                Message msg = createMessage(kind, (Path) event.context());
-
-                if (msg == null) continue;
-
-                setChanged();
-                notifyObservers(msg);
-            }
+            key.pollEvents().forEach(this::handleSingleEvent);
             if (!key.reset()) {
                 break;
             }
         }
+    }
+
+    private void handleSingleEvent(WatchEvent<?> event) {
+        WatchEvent.Kind<?> kind = event.kind();
+        Message msg = createMessage(kind, (Path) event.context());
+        if (msg == null) {
+            return;
+        }
+        setChanged();
+        notifyObservers(msg);
     }
 
     private Message createMessage(WatchEvent.Kind<?> kind, Path newFile) {
