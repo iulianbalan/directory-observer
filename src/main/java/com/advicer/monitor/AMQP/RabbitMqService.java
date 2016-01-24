@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
@@ -31,9 +32,11 @@ public class RabbitMqService {
     @Value(value = "${rabbitmq.routingKey}")
     private String routingKey;
 
+    @Resource
+    private ConnectionFactory connectionFactory;
+
     private Connection connection;
     private Channel channel;
-    private ConnectionFactory factory;
 
     @Autowired
     private RabbitMQCredentials rabbitMQCredentials;
@@ -42,32 +45,30 @@ public class RabbitMqService {
     }
 
     private void setUpParameters() {
-        this.factory = new ConnectionFactory();
         if (rabbitMQCredentials.getHostname() != null) {
-            factory.setHost(rabbitMQCredentials.getHostname());
+            connectionFactory.setHost(rabbitMQCredentials.getHostname());
         }
         if (rabbitMQCredentials.getPort() > 0) {
-            factory.setPort(rabbitMQCredentials.getPort());
+            connectionFactory.setPort(rabbitMQCredentials.getPort());
         }
         if (rabbitMQCredentials.getUsername() != null) {
-            factory.setUsername(rabbitMQCredentials.getUsername());
+            connectionFactory.setUsername(rabbitMQCredentials.getUsername());
         }
         if (rabbitMQCredentials.getPassword() != null) {
-            factory.setPassword(rabbitMQCredentials.getPassword());
+            connectionFactory.setPassword(rabbitMQCredentials.getPassword());
         }
     }
 
     /**
      * Create a RabbitMQ connection using custom rabbitMQCredentials
      *
-     * @throws IOException      when there's trouble establishing a new connection
-     * @throws TimeoutException when there's trouble establishing a new connection
+     * @throws ApplicationException when there's trouble establishing a new connection
      */
     public void connect() {
         this.setUpParameters();
         try {
-            this.connection = factory.newConnection();
-            log.info(CONNECTED, factory.getHost(), factory.getPort());
+            this.connection = connectionFactory.newConnection();
+            log.info(CONNECTED, connectionFactory.getHost(), connectionFactory.getPort());
 
             this.channel = this.connection.createChannel();
             channel.exchangeDeclare(exchangeName, exchangeType, true);
@@ -92,5 +93,9 @@ public class RabbitMqService {
         } catch (IOException | TimeoutException e) {
             throw new ApplicationException("Error closing the connection", e);
         }
+    }
+
+    void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
 }

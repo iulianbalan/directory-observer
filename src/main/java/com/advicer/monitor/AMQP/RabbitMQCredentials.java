@@ -5,6 +5,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
+import static com.advicer.monitor.util.DirectoryObserverConstants.HOSTNAME_KEY;
+import static com.advicer.monitor.util.DirectoryObserverConstants.PASSWORD_KEY;
+import static com.advicer.monitor.util.DirectoryObserverConstants.PORT_KEY;
+import static com.advicer.monitor.util.DirectoryObserverConstants.USERNAME_KEY;
+
 /**
  * Simple class used to store credentials and connection
  * parameters for a RabbitMQ connections instance
@@ -13,11 +18,6 @@ import java.util.Properties;
  */
 @Component
 public class RabbitMQCredentials {
-
-    private static final String HOSTNAME_KEY = "host";
-    private static final String PORT_KEY = "port";
-    private static final String USERNAME_KEY = "username";
-    private static final String PASSWORD_KEY = "password";
 
     @Getter
     private String hostname;
@@ -38,7 +38,11 @@ public class RabbitMQCredentials {
     /**
      * Constructor that gets the fields from a Properties object
      *
-     * @param prop
+     * @param prop properties containing
+     *             {@link com.advicer.monitor.util.DirectoryObserverConstants#HOSTNAME_KEY}
+     *             {@link com.advicer.monitor.util.DirectoryObserverConstants#PORT_KEY}
+     *             {@link com.advicer.monitor.util.DirectoryObserverConstants#USERNAME_KEY}
+     *             {@link com.advicer.monitor.util.DirectoryObserverConstants#PASSWORD_KEY}
      */
     public RabbitMQCredentials(Properties prop) {
         this(prop.getProperty(HOSTNAME_KEY),
