@@ -16,17 +16,27 @@ public class Message {
     public Message() {
     }
 
+    public String getAction() {
+        return action;
+    }
+
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getFile() {
+        return file;
     }
 
     public void setFile(String file) {
         this.file = file;
     }
 
+    public String getFullPath() {
+        return fullPath;
+    }
+
     public void setFullPath(String fullPath) {
         this.fullPath = fullPath;
     }
-
-
 }

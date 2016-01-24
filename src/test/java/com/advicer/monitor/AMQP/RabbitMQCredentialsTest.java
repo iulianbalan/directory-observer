@@ -12,7 +12,7 @@ import static com.advicer.monitor.util.DirectoryObserverConstants.PORT_KEY;
 import static com.advicer.monitor.util.DirectoryObserverConstants.USERNAME_KEY;
 
 /**
- * Created by Iulian Balan on 24.01.2016.
+ * @author Iulian Balan
  */
 public class RabbitMQCredentialsTest {
 

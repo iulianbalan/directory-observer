@@ -34,7 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Created by Iulian Balan on 24.01.2016.
+ * @author Iulian Balan
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringJUnit4ClassRunner.class)

@@ -1,14 +1,11 @@
 package com.advicer.monitor.util;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
+import com.advicer.monitor.exceptions.ApplicationException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
-import java.util.Properties;
 
 /**
  * Utility class
@@ -17,7 +14,7 @@ import java.util.Properties;
  */
 public class Utils {
 
-    private static ObjectMapper ow;
+    private static ObjectMapper objectMapper;
 
     /**
      * Utility function meant to control all system's properties necessary to
@@ -28,55 +25,37 @@ public class Utils {
      */
     public static boolean checkDirectory(String path) {
 
-        File f = Paths.get(path).toFile();
-        return f.exists() && f.isDirectory() && f.canRead();
+        File file = Paths.get(path).toFile();
+        return checkDirectory(file);
     }
 
     /**
      * Utility function meant to control all system's properties necessary to
      * perform a monitoring
      *
-     * @param f File representing the monitored folder
+     * @param file File representing the monitored folder
      * @return true if everything is all right
      */
-    public static boolean checkDirectory(File f) {
+    public static boolean checkDirectory(File file) {
 
-        return f.exists() && f.isDirectory() && f.canRead();
+        return file.exists() && file.isDirectory() && file.canRead();
     }
 
     /**
      * Serializing object to JSON
      *
-     * @param o any object
+     * @param object any object
      * @return a String serialized in JSON
-     * @throws JsonGenerationException
-     * @throws JsonMappingException
-     * @throws IOException
+     * @throws ApplicationException in case of serializing problems
      */
-    public static String ObjectToJson(Object o) throws JsonGenerationException,
-            JsonMappingException, IOException {
-        if (ow == null) {
-            ow = new ObjectMapper();
+    public static String ObjectToJson(Object object) {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
         }
-        // 1. Convert Java object to JSON format
-        return ow.writer().withDefaultPrettyPrinter().writeValueAsString(o);
-    }
-
-    /**
-     * Reading property file from resources
-     *
-     * @param file String specifying the file name
-     * @return Property object
-     * @throws IOException
-     */
-    public static Properties readPropertyFile(String file) throws IOException {
-        InputStream in = Utils.class.getClassLoader().getResourceAsStream(file);
-        if (in == null) {
-            return null;
+        try {
+            return objectMapper.writer().writeValueAsString(object);
+        } catch (IOException e) {
+            throw new ApplicationException("Error serializing the object", e);
         }
-        Properties prop = new Properties();
-        prop.load(in);
-        in.close();
-        return prop;
     }
 }
