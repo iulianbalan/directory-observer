@@ -83,8 +83,7 @@ public class RabbitMqServiceTest {
     @Test()
     public void shouldCreateChannelOnConnecting() throws Exception {
         //given
-        doReturn(connection).when(connectionFactory).newConnection();
-        doReturn(channel).when(connection).createChannel();
+        mockChannelCreation();
 
         //when
         rabbitMqService.connect();
@@ -96,8 +95,7 @@ public class RabbitMqServiceTest {
     @Test()
     public void shouldDeclareExchangeOnConnecting() throws Exception {
         //given
-        doReturn(connection).when(connectionFactory).newConnection();
-        doReturn(channel).when(connection).createChannel();
+        mockChannelCreation();
 
         //when
         rabbitMqService.connect();
@@ -110,9 +108,7 @@ public class RabbitMqServiceTest {
     public void shouldPublishJson() throws Exception {
         //given
         String jsonMessage = "lol json fake";
-        doReturn(connection).when(connectionFactory).newConnection();
-        doReturn(channel).when(connection).createChannel();
-        rabbitMqService.connect();
+        mockConnection();
         PowerMockito.when(Utils.ObjectToJson(anyObject())).thenReturn(jsonMessage);
 
 
@@ -125,9 +121,7 @@ public class RabbitMqServiceTest {
 
     @Test(expected = ApplicationException.class)
     public void shouldThrowApplicationExceptionWhenIOExceptionInPublish() throws Exception {
-        doReturn(connection).when(connectionFactory).newConnection();
-        doReturn(channel).when(connection).createChannel();
-        rabbitMqService.connect();
+        mockConnection();
         doThrow(IOException.class).when(channel).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
         PowerMockito.when(Utils.ObjectToJson(anyObject())).thenReturn("fake");
 
@@ -137,9 +131,7 @@ public class RabbitMqServiceTest {
     @Test(expected = ApplicationException.class)
     public void shouldThrowApplicationExceptionWhenIOExceptionInClose() throws Exception {
         //given
-        doReturn(connection).when(connectionFactory).newConnection();
-        doReturn(channel).when(connection).createChannel();
-        rabbitMqService.connect();
+        mockConnection();
         doThrow(IOException.class).when(channel).close();
 
         rabbitMqService.closeConnection();
@@ -148,11 +140,19 @@ public class RabbitMqServiceTest {
     @Test(expected = ApplicationException.class)
     public void shouldThrowApplicationExceptionWhenTimeoutExceptionInClose() throws Exception {
         //given
-        doReturn(connection).when(connectionFactory).newConnection();
-        doReturn(channel).when(connection).createChannel();
-        rabbitMqService.connect();
+        mockConnection();
         doThrow(TimeoutException.class).when(channel).close();
 
         rabbitMqService.closeConnection();
+    }
+
+    private void mockConnection() throws IOException, TimeoutException {
+        mockChannelCreation();
+        rabbitMqService.connect();
+    }
+
+    private void mockChannelCreation() throws IOException, TimeoutException {
+        doReturn(connection).when(connectionFactory).newConnection();
+        doReturn(channel).when(connection).createChannel();
     }
 }
