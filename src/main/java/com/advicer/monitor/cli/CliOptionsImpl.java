@@ -22,9 +22,11 @@ public class CliOptionsImpl implements CliOptions {
 
     //	Constants for cli argument descriptions
     private static final String PATH_DESC = "Give the absolute path to the directory to monitor";
-    private static final String EXCLUDE_CREATION_DESC = "Select the flag of the monitoring if you want to exclude file CREATION";
-    private static final String EXCLUDE_MODIFICATION_DESC = "Select the flag of the monitoring if you want to exclude file MODIFICATION";
-    private static final String EXCLUDE_DELETION_DESC = "Select the flag of the monitoring if you want to exclude file DELETION";
+
+    private static final String EXCLUDE_DESC = "Select the flag of the monitoring if you want to exclude file %s";
+    private static final String EXCLUDE_CREATION_DESC = String.format(EXCLUDE_DESC, "CREATION");
+    private static final String EXCLUDE_MODIFICATION_DESC = String.format(EXCLUDE_DESC, "MODIFICATION");
+    private static final String EXCLUDE_DELETION_DESC = String.format(EXCLUDE_DESC, "DELETION");
 
 
     //	private fields
@@ -106,9 +108,7 @@ public class CliOptionsImpl implements CliOptions {
      */
     @Override
     public boolean hasOption(DirectoryObserverEventsConstants arg) throws ParseException {
-        if (line == null) {
-            throw new ParseException(COMMAND_LINE_NOT_PARSED);
-        }
+        validateLine();
         return this.line.hasOption(arg.getFlag());
 
     }
@@ -118,10 +118,14 @@ public class CliOptionsImpl implements CliOptions {
      */
     @Override
     public String getOptionValue(DirectoryObserverEventsConstants arg) throws ParseException {
+        validateLine();
+        return this.line.getOptionValue(arg.getFlag());
+    }
+
+    private void validateLine() throws ParseException {
         if (line == null) {
             throw new ParseException(COMMAND_LINE_NOT_PARSED);
         }
-        return this.line.getOptionValue(arg.getFlag());
     }
 
     /* (non-Javadoc)
