@@ -4,7 +4,7 @@ public enum DirectoryObserverEventsConstants {
 
     PATH("p", "path"), CREATION("C"), DELETION("D"), MODIFICATION("M");
 
-    //Making private fields final to avoid evil code
+    //Making private fields final to avoid evil code.
     private final String flag;
     private final String arg;
 

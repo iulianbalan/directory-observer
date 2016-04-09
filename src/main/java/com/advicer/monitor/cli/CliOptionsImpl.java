@@ -12,7 +12,7 @@ import org.apache.commons.cli.ParseException;
 
 /**
  * Class used for the command line options and arguments
- * This class is an implementation of ICliOptions
+ * This class is an implementation of {@link CliOptions}
  *
  * @author Iulian Balan
  */
