@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd">
+
+    <jee:jndi-lookup id="jmsConnectionFactory" jndi-name="jms/myCF "/>
+
+    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <prop key="java.naming.factory.initial">weblogic.jndi.WLInitialContextFactory</prop>
+                <prop key="java.naming.provider.url">t3://localhost:7001</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="queueConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" ref="jmsConnectionFactory"/>
+    </bean>
+
+    <bean id="jmsDestinationResolver" class="org.springframework.jms.support.destination.JndiDestinationResolver">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="cache" value="true"/>
+    </bean>
+
+    <bean id="invoiceQueueTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="queueConnectionFactory"/>
+        <property name="destinationResolver" ref="jmsDestinationResolver"/>
+    </bean>
+
+    <bean id="jmsReceiver" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="concurrentConsumers" value="5" />
+        <property name="connectionFactory" ref="queueConnectionFactory" />
+        <property name="destination" ref="invoiceQueue" />
+        <property name="messageListener" ref="invoiceListener" />
+    </bean>
+
+    <bean id="jmsInvoiceSender" class="com.advicer.monitor.AMQP.JmsSender">
+        <property name="" ref="invoiceQueueTemplate"/>
+    </bean>
+
+</beans>

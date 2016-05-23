@@ -1,5 +1,7 @@
 package com.advicer.monitor.dto;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 /**
  * Class that provides a very basic model
  * of a message that is going to be serialized.
@@ -7,6 +9,7 @@ package com.advicer.monitor.dto;
  *
  * @author Iulian Balan
  */
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Message {
 
     private String action;
@@ -28,5 +31,15 @@ public class Message {
         this.fullPath = fullPath;
     }
 
+    public String getAction() {
+        return action;
+    }
 
+    public String getFile() {
+        return file;
+    }
+
+    public String getFullPath() {
+        return fullPath;
+    }
 }

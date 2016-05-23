@@ -21,19 +21,17 @@
     <bean class="com.advicer.monitor.AMQP.RabbitMqService" id="rabbitMqService"/>
 
     <bean class="com.advicer.monitor.IntegrationManager" id="integrationManager" />
-    <bean class="com.advicer.monitor.queue.QueueProcessor">
-        <constructor-arg>
-            <ref bean="arrayBlockingQueue"/>
-        </constructor-arg>
-    </bean>
-    <bean class="com.advicer.monitor.queue.QueueHandler">
-        <constructor-arg>
-            <ref bean="arrayBlockingQueue"/>
-        </constructor-arg>
-    </bean>
     <bean class="java.util.concurrent.ArrayBlockingQueue" id="arrayBlockingQueue" >
         <constructor-arg value="${queue.messages.max}"/>
     </bean>
+    <bean class="com.advicer.monitor.queue.QueueProcessor">
+        <constructor-arg ref="arrayBlockingQueue" />
+    </bean>
+    <bean class="com.advicer.monitor.queue.QueueHandler">
+        <constructor-arg ref="arrayBlockingQueue"/>
+    </bean>
+
+    <import resource="jms.xml" />
 
     <context:annotation-config />
     <context:component-scan base-package="com.advicer.monitor.queue" />
