@@ -1,6 +1,6 @@
 package com.advicer.monitor.queue;
 
-import com.advicer.monitor.AMQP.RabbitMqService;
+import com.advicer.monitor.amqp.RabbitMqService;
 import com.advicer.monitor.dto.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

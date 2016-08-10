@@ -36,7 +36,7 @@
         <property name="messageListener" ref="invoiceListener" />
     </bean>
 
-    <bean id="jmsInvoiceSender" class="com.advicer.monitor.AMQP.JmsSender">
+    <bean id="jmsInvoiceSender" class="com.advicer.monitor.amqp.JmsSender">
         <property name="" ref="invoiceQueueTemplate"/>
     </bean>
 

@@ -1,4 +1,4 @@
-package com.advicer.monitor.AMQP;
+package com.advicer.monitor.amqp;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;

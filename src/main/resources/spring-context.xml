@@ -7,7 +7,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations" value="application.properties"/>
     </bean>
-    <bean id="rabbitMQCredentials" class="com.advicer.monitor.AMQP.RabbitMQCredentials">
+    <bean id="rabbitMQCredentials" class="com.advicer.monitor.amqp.RabbitMQCredentials">
         <constructor-arg>
             <props>
                 <prop key="host">${rabbitmq.host}</prop>
@@ -18,7 +18,7 @@
         </constructor-arg>
     </bean>
 
-    <bean class="com.advicer.monitor.AMQP.RabbitMqService" id="rabbitMqService"/>
+    <bean class="com.advicer.monitor.amqp.RabbitMqService" id="rabbitMqService"/>
 
     <bean class="com.advicer.monitor.IntegrationManager" id="integrationManager" />
     <bean class="java.util.concurrent.ArrayBlockingQueue" id="arrayBlockingQueue" >

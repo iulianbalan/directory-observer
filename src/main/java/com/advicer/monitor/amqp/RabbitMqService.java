@@ -1,4 +1,4 @@
-package com.advicer.monitor.AMQP;
+package com.advicer.monitor.amqp;
 
 import com.advicer.monitor.dto.Message;
 import com.advicer.monitor.exceptions.ApplicationException;
